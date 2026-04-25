@@ -1,0 +1,228 @@
+import 'package:flutter/material.dart';
+import 'login_screen.dart';
+
+class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({Key? key}) : super(key: key);
+
+  @override
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  late PageController _pageController;
+  int _currentPage = 0;
+
+  final List<OnboardingModel> onboardingData = [
+    OnboardingModel(
+      title: 'Buy Airtime',
+      description: 'Easily buy airtime for all networks instantly',
+      icon: Icons.phone_android,
+      color: Colors.blue,
+    ),
+    OnboardingModel(
+      title: 'Buy Data',
+      description: 'Get affordable data plans for browsing',
+      icon: Icons.cloud_download,
+      color: Colors.green,
+    ),
+    OnboardingModel(
+      title: 'Pay Bills',
+      description: 'Pay TV subscriptions and utility bills',
+      icon: Icons.receipt_long,
+      color: Colors.orange,
+    ),
+    OnboardingModel(
+      title: 'Fast & Secure',
+      description: 'Secure transactions with instant delivery',
+      icon: Icons.security,
+      color: Colors.purple,
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          PageView.builder(
+            controller: _pageController,
+            onPageChanged: (int page) {
+              setState(() {
+                _currentPage = page;
+              });
+            },
+            itemCount: onboardingData.length,
+            itemBuilder: (context, index) {
+              return OnboardingPage(data: onboardingData[index]);
+            },
+          ),
+          Positioned(
+            bottom: 50,
+            left: 0,
+            right: 0,
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    onboardingData.length,
+                    (index) => buildDot(index),
+                  ),
+                ),
+                const SizedBox(height: 30),
+                _currentPage == onboardingData.length - 1
+                    ? ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 50,
+                            vertical: 15,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pushReplacementNamed('/login');
+                        },
+                        child: const Text(
+                          'Get Started',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              _pageController.jumpToPage(
+                                onboardingData.length - 1,
+                              );
+                            },
+                            child: const Text(
+                              'Skip',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 40,
+                                vertical: 12,
+                              ),
+                            ),
+                            onPressed: () {
+                              _pageController.nextPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            },
+                            child: const Text(
+                              'Next',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildDot(int index) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 5),
+      height: 8,
+      width: _currentPage == index ? 25 : 8,
+      decoration: BoxDecoration(
+        color: _currentPage == index ? Colors.blue : Colors.grey,
+        borderRadius: BorderRadius.circular(4),
+      ),
+    );
+  }
+}
+
+class OnboardingPage extends StatelessWidget {
+  final OnboardingModel data;
+
+  const OnboardingPage({Key? key, required this.data}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [data.color.withOpacity(0.3), Colors.white],
+        ),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              data.icon,
+              size: 100,
+              color: data.color,
+            ),
+            const SizedBox(height: 30),
+            Text(
+              data.title,
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 15),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Text(
+                data.description,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class OnboardingModel {
+  final String title;
+  final String description;
+  final IconData icon;
+  final Color color;
+
+  OnboardingModel({
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.color,
+  });
+}
