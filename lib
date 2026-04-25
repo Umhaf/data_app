@@ -1,0 +1,6 @@
+lib/
+ ├── models/
+ ├── screens/
+ ├── services/
+ ├── widgets/
+ └── utils/
